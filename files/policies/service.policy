@@ -1,0 +1,2 @@
+# /etc/mcollective/policies/service.policy
+policy default allow

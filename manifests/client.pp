@@ -178,7 +178,7 @@ class mcollective::client(
   # Management of SSL keys
   if( $mcollective::security_provider == 'ssl' ) {
     # Ensure the package is installed before we create this directory
-    Package[$package] -> File["${etcdir}/ssl"]
+    #Package[$package] -> File["${etcdir}/ssl"]
 
     # copy the server public keys to all servers
     realize File["${etcdir}/ssl/server/public.pem"]
