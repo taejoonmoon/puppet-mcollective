@@ -110,9 +110,11 @@ define mcollective::userconfig(
   }
   $private_key = "${homepath}/.mcollective.d/private_keys/${user}.pem"
   $public_key  = "${homepath}/.mcollective.d/public_keys/${user}.pem"
+  $cert_key  = "${homepath}/.mcollective.d/certs/ca.pem"
 
   # Stubs for SSL trusted, must be created by user
   $ssl_private = "${homepath}/.puppet/ssl/private_keys/${user}.pem"
+  $ssl_public = "${homepath}/.puppet/ssl/public_keys/${user}.pem"
   $ssl_cert    = "${homepath}/.puppet/ssl/certs/${user}.pem"
   $ca_cert     = "${homepath}/.puppet/ssl/certs/ca.pem"
 
@@ -127,18 +129,31 @@ define mcollective::userconfig(
     group  => $group,
   }
 
-  exec { "create-private-${user}":
-    path    => '/usr/bin:/usr/local/bin',
-    command => "openssl genrsa -out ${private_key} 2048",
-    unless  => "/usr/bin/test -e ${private_key}",
+  file { "$private_key":
+    ensure  => link,
+    target => $ssl_private,
+  }
+  file { "$public_key":
+    ensure  => link,
+    target => $ssl_public,
+  }
+  file { "$cert_key":
+    ensure  => link,
+    target => $ca_cert,
   }
 
-  exec { "create-public-${user}":
-    path    => '/usr/bin:/usr/local/bin',
-    command => "openssl rsa -in ${private_key} -out ${public_key}",
-    unless  => "/usr/bin/test -e ${public_key}",
-    require => Exec["create-private-${user}"],
-  }
+#  exec { "create-private-${user}":
+#    path    => '/usr/bin:/usr/local/bin',
+#    command => "openssl genrsa -out ${private_key} 2048",
+#    unless  => "/usr/bin/test -e ${private_key}",
+#  }
+#
+#  exec { "create-public-${user}":
+#    path    => '/usr/bin:/usr/local/bin',
+#    command => "openssl rsa -in ${private_key} -out ${public_key}",
+#    unless  => "/usr/bin/test -e ${public_key}",
+#    require => Exec["create-private-${user}"],
+#  }
 
   file { "${homepath}/${filename}":
     ensure  => file,
